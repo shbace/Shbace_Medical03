@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Shbace Medical",
+  "short_name": "Shbace",
+  "description": "Shbace Medical Question Bank",
+  "start_url": "./pwa-boot.html?launch=1",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#071322",
+  "theme_color": "#0D2945",
+  "icons": [
+    {
+      "src": "./splash_icon.png",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
