@@ -1,0 +1,13 @@
+SHBACE MEDICAL — ANDROID HAPTICS SETUP
+
+The uploaded HTML already contains the ECG splash haptics logic. It looks for
+window.ShbaceHaptics and calls vibrate({ duration }) / impact({ style }).
+This project adds the official @capacitor/haptics plugin and a small bridge
+that exposes those methods to the existing HTML without rewriting its logic.
+
+The bridge is bundled into www/native-bridge.js by: npm run build
+The Android setup script also ensures android.permission.VIBRATE is present.
+
+Important: haptics are limited by the device hardware, system vibration
+settings, and reduced-motion preference. The HTML itself disables this effect
+when prefers-reduced-motion is enabled or the splash is not active.
