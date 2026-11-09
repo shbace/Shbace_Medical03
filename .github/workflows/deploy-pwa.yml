@@ -7,22 +7,58 @@ on:
       - 'www/**'
       - 'splash_icon.png'
       - '.github/workflows/deploy-pwa.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'www/**'
+      - 'splash_icon.png'
+      - '.github/workflows/deploy-pwa.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: github-pages
+  group: github-pages-\${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  validate:
+    name: Validate PWA files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Validate manifest JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('www/manifest.webmanifest', 'utf8'))"
+
+      - name: Validate service worker syntax
+        run: node --check www/service-worker.js
+
+      - name: Validate boot page script
+        run: |
+          node -e "const fs=require('fs'); const html=fs.readFileSync('www/pwa-boot.html','utf8'); const scripts=[...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/gi)]; if (!scripts.length) process.exit(1); scripts.forEach(s => new Function(s[1]));"
+
+      - name: Verify publishing inputs
+        run: |
+          test -s www/index.html
+          test -s www/pwa-boot.html
+          test -s www/manifest.webmanifest
+          test -s www/service-worker.js
+          test -s splash_icon.png
+
   deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: validate
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: \${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,18 +69,13 @@ jobs:
 
       - name: Prepare PWA publishing directory
         shell: bash
-        run: |
-          test -s www/index.html
-          test -s www/pwa-boot.html
-          test -s www/manifest.webmanifest
-          test -s www/service-worker.js
-          cp splash_icon.png www/splash_icon.png
+        run: cp splash_icon.png www/splash_icon.png
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: www
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
