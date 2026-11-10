@@ -26,12 +26,9 @@ if output.exists():
     shutil.rmtree(output)
 output.mkdir(parents=True)
 
-# Keep the current published PWA untouched at the site root.
-shutil.copytree(source, output, dirs_exist_ok=True)
-shutil.copy2(icon_path, output / "splash_icon.png")
-
-# Publish a physically separate v2 app tree so its manifest, scope and caches
-# cannot be confused with the legacy installation.
+# Publish only the new V2 release. The legacy app source remains in the
+# repository, but is intentionally excluded from this new Pages deployment.
+# This avoids doubling the upload size and keeps the iPhone/iPad release isolated.
 v2 = output / "v2"
 shutil.copytree(source, v2)
 shutil.copy2(icon_path, v2 / "splash_icon.png")
