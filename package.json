@@ -2,14 +2,12 @@
   "name": "shbace-medical-capacitor",
   "version": "1.0.0",
   "private": true,
-  "description": "Shbace Medical Android application using Capacitor",
+  "description": "Shbace Medical Android application using Capacitor 8",
   "scripts": {
-    "build": "esbuild src/native-bridge.js --bundle --platform=browser --format=iife --target=es2020 --outfile=www/native-bridge.js",
-    "web:use": "node scripts/use-web-file.mjs",
-    "check:web": "node scripts/check-web.mjs",
-    "android:add": "npm run build && cap add android && node scripts/ensure-vibrate-permission.mjs",
-    "android:sync": "npm run build && cap sync android && node scripts/ensure-vibrate-permission.mjs",
-    "android:open": "cap open android"
+    "check:web": "node --check www/native-bridge.js && node -e \"JSON.parse(require('fs').readFileSync('www/manifest.webmanifest','utf8'))\"",
+    "android:add": "npx cap add android",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",

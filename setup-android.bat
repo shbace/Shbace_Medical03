@@ -2,46 +2,53 @@
 setlocal
 cd /d "%~dp0"
 echo ===============================================
-echo SHBACE MEDICAL - Android project setup
+echo SHBACE MEDICAL - Android Studio project setup
 echo ===============================================
 where node >nul 2>nul
 if errorlevel 1 (
-  echo ERROR: Node.js 22 or newer is required.
-  echo Install Node.js 22+ and run this file again.
+  echo ERROR: Install Node.js 22 or newer first.
   pause
   exit /b 1
 )
 node -e "if (Number(process.versions.node.split('.')[0]) < 22) process.exit(1)"
 if errorlevel 1 (
-  echo ERROR: Node.js 22 or newer is required. Detected:
+  echo ERROR: Node.js 22 or newer is required.
   node --version
   pause
   exit /b 1
 )
-echo Installing project packages...
-npm install --no-audit --no-fund
+where java >nul 2>nul
+if errorlevel 1 (
+  echo ERROR: Install Android Studio and JDK 21 first.
+  pause
+  exit /b 1
+)
+echo [1/4] Installing project dependencies...
+call npm ci --no-audit --no-fund
 if errorlevel 1 goto failed
-echo Building the native Haptics bridge...
-npm run build
+echo [2/4] Checking web application files...
+call npm run check:web
 if errorlevel 1 goto failed
 if not exist "android\app\src\main\AndroidManifest.xml" (
-  echo Creating the Android native project...
-  npx cap add android
+  echo [3/4] Creating the native Android project...
+  call npx cap add android
   if errorlevel 1 goto failed
+) else (
+  echo [3/4] Existing Android project found.
 )
-node scripts\ensure-vibrate-permission.mjs
-if errorlevel 1 goto failed
-echo Syncing web files and native plugins...
-npx cap sync android
+echo [4/4] Syncing web app and native plugins...
+call npx cap sync android
 if errorlevel 1 goto failed
 echo Opening Android Studio...
-npx cap open android
+call npx cap open android
 if errorlevel 1 goto failed
-echo Done. Build the APK from Android Studio: Build ^> Build Bundle(s) / APK(s) ^> Build APK(s).
+echo.
+echo Setup complete. In Android Studio choose:
+echo Build ^> Build Bundle(s) / APK(s) ^> Build APK(s)
 pause
 exit /b 0
 :failed
 echo.
-echo Setup did not complete. Copy the error shown above and send it to ChatGPT.
+echo Setup failed. Review the error above.
 pause
 exit /b 1
