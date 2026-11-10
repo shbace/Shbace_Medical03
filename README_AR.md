@@ -1,54 +1,50 @@
-# مشروع Shbace Medical — Capacitor Android
+# Shbace Medical — Android Studio + iPhone PWA
 
-هذا المشروع يضع ملف Shbace Medical الذي أرسلته داخل مجلد `www`، ويجهّزه للتشغيل كتطبيق Android باستخدام Capacitor 8. تم الاحتفاظ بنسخة المصدر الأصلية دون تعديل داخل `source/`.
+## Android Studio
 
-## محتويات المشروع
+This repository contains the Shbace Medical web application and its Capacitor 8 configuration. The Android project is generated reproducibly by the Android build workflow.
 
-- `www/index.html`: ملف التطبيق الذي سيُحمّل داخل التطبيق. التغيير الوحيد مقارنة بالأصل هو إضافة تحميل جسر الاهتزاز المحلي داخل `<head>`.
-- `source/SHBACE_MEDICAL_original.html`: نسخة احتياطية مطابقة للملف الأصلي الذي أرسلته.
-- `src/native-bridge.js`: يربط الاهتزاز الموجود أصلًا في HTML بإضافة Capacitor Haptics.
-- `capacitor.config.ts`: إعدادات Capacitor واسم التطبيق ومعرّفه.
-- `setup-android.bat`: إعداد تلقائي على Windows.
-- `setup-android.sh`: إعداد تلقائي على macOS / Linux.
+### Automatic project ZIP and APK
 
-## طريقة التشغيل على Windows
+1. Open **Actions** in this GitHub repository.
+2. Select **Build Shbace Medical Android**.
+3. Choose **Run workflow** on the `main` branch.
+4. Wait for the green completed run.
+5. Download **Shbace-Medical-Android-Deliverables** from the run's Artifacts section.
+6. The artifact contains:
+   - `Shbace_Medical_Android_Studio.zip`: complete Android Studio project, including the generated `android/` directory and Gradle Wrapper.
+   - `Shbace_Medical.apk`: debug APK for direct installation.
 
-1. فك ضغط الملف ZIP على الكمبيوتر.
-2. ثبّت Node.js 22 أو أحدث، وثبّت Android Studio مع Android SDK.
-3. افتح مجلد `ShbaceMedical_Capacitor_Project`.
-4. اضغط مرتين على `setup-android.bat`.
-5. بعد فتح المشروع في Android Studio، انتظر اكتمال Gradle Sync، ثم اختر **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+The generated project uses the official app icon artwork in `splash_icon.png`, Capacitor application ID `com.shbace.medical`, and app name `Shbace Medical`.
 
-السكربت ينفذ تثبيت المكتبات، وبناء جسر الاهتزاز، وإنشاء مجلد Android إذا لم يكن موجودًا، وإضافة إذن الاهتزاز، ومزامنة المشروع، ثم فتحه في Android Studio.
+### Local setup (Windows)
 
-## أوامر التشغيل يدويًا
+Requirements: Android Studio with Android SDK, JDK 21, and Node.js 22 or newer.
 
-من Terminal داخل مجلد المشروع نفّذ الأوامر التالية:
+1. Download or clone this repository.
+2. Run `setup-android.bat`.
+3. The script installs dependencies, creates the Android project if needed, syncs Capacitor plugins and opens Android Studio.
+4. In Android Studio choose **Build → Build Bundle(s) / APK(s) → Build APK(s)**.
+
+### Local setup (macOS / Linux)
+
+Install the same prerequisites, then run:
 
 ```bash
-npm install
-npm run build
-npx cap add android
-node scripts/ensure-vibrate-permission.mjs
-npx cap sync android
-npx cap open android
+chmod +x setup-android.sh
+./setup-android.sh
 ```
 
-إذا كان مجلد `android` موجودًا مسبقًا، تخطَّ أمر `npx cap add android` واستخدم `npx cap sync android`.
+## iPhone PWA
 
-## بيانات التطبيق الافتراضية
+The PWA is published at:
 
-- الاسم: `Shbace Medical`
-- Android application ID: `com.shbace.medical`
-- مجلد ملفات الويب: `www`
-- Capacitor: الإصدار الرئيسي 8
+https://shbace.github.io/Shbace_Medical03/pwa-boot.html
 
-يمكن تغيير الاسم أو المعرّف من `capacitor.config.ts`، لكن إذا تغيّر المعرّف بعد إنشاء مجلد Android فيجب أيضًا تحديث إعدادات المشروع الأصلي.
+On iPhone: open the link in Safari → Share → Add to Home Screen. Keep **Open as Web App** enabled.
 
-## ملاحظات مهمة عن الحماية
+The service worker caches the application shell and same-origin resources after the first successful online visit. Third-party services and remote documents may still require connectivity.
 
-تغليف HTML داخل APK لا يمنع استخراج الملفات من APK بشكل مطلق. هذا المشروع يمنع الحاجة إلى إرسال ملف HTML منفصل للطلاب، لكنه لا يقدّم حماية تشفير كاملة للكود أو بنك الأسئلة. للحماية الأقوى، يجب نقل بنك الأسئلة أو المحتوى المراد حمايته إلى خادم، وإرساله بعد التحقق من صلاحية المستخدم.
+## Data integrity
 
-## ما لم يتم إنجازه داخل هذه الحزمة
-
-هذه حزمة مشروع Capacitor الجاهزة للتهيئة، وليست APK مبنيًا. لم يتم إنشاء مجلد `android` الأصلي أو توقيع APK داخل بيئة الإنشاء هذه لأنها تحتاج إلى تنزيل حزم Capacitor وإلى إعداد Android SDK / Android Studio على جهاز البناء. ملف `setup-android.bat` ينفّذ إنشاء مشروع Android ومزامنته تلقائيًا على جهازك.
+The original medical content and question-bank assets in `www/` are included in the project. Do not replace them with demo data. Keep a separate backup before changing the question bank or its schema.
